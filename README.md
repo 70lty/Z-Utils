@@ -2,6 +2,7 @@
 <h3 align="center">Open source tool</h3>
 
 - 🔭 Use Github.py on **Blender**
+- 🔋​ **Automatic UPDATE !!**
 
 <p align="left">
 </p>
