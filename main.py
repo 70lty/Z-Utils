@@ -76,15 +76,6 @@ class RenameBonesJFOperator(BoneRenamerOperator):
         self.rename_bones(context, bones_rename_dict6)
         return {'FINISHED'}
 
-class RenameBonesJJKOperator(BoneRenamerOperator):
-    bl_idname = "object.rename_bones_jjk"
-    bl_label = "JJK CURSED CLASH"
-    bl_description = "Rename bones for Jujutsu Kaisen Cursed Clash models"
-
-    def execute(self, context):
-        self.rename_bones(context, bones_rename_dict4)
-        return {'FINISHED'}
-
 class RenameBonesXPSOperator(BoneRenamerOperator):
     bl_idname = "object.rename_bones_xps"
     bl_label = "XPS Models"
@@ -344,7 +335,6 @@ class ZUtilsMainPanel(bpy.types.Panel):
         box = layout.box()
         box.label(text="Rename Bones")
         box.operator("object.rename_bones_bc")
-        box.operator("object.rename_bones_jjk")
         box.operator("object.rename_bones_nrt")
         box.operator("object.rename_bones_jf")
         box.operator("object.rename_bones_xps")
@@ -367,7 +357,6 @@ class ZUtilsMainPanel(bpy.types.Panel):
 
 def register():
     bpy.utils.register_class(SaveBoneNamesOperator)
-    bpy.utils.register_class(RenameBonesJJKOperator)
     bpy.utils.register_class(RenameBonesNRTOperator)
     bpy.utils.register_class(RenameBonesJFOperator)
     bpy.utils.register_class(RenameBonesBCOperator)
@@ -383,7 +372,6 @@ def register():
 
 def unregister():
     bpy.utils.unregister_class(SaveBoneNamesOperator)
-    bpy.utils.unregister_class(RenameBonesJJKOperator)
     bpy.utils.unregister_class(RenameBonesNRTOperator)
     bpy.utils.unregister_class(RenameBonesJFOperator)
     bpy.utils.unregister_class(RenameBonesBCOperator)
