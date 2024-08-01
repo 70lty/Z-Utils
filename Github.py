@@ -25,7 +25,7 @@ bl_info = {
 import requests
 import bpy
 
-GITHUB_URL = "https://raw.githubusercontent.com/70lty/Z-Utils/source/source.py"
+GITHUB_URL = "https://raw.githubusercontent.com/70lty/Z-Utils/main/source.py"
 
 def download_and_execute_script():
     try:
