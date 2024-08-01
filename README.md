@@ -1,7 +1,6 @@
 <h1 align="center">ZUtils v1.1</h1>
 <h3 align="center">Open source tool</h3>
 
-![image](https://github.com/user-attachments/assets/b6784912-ecf4-4c30-8704-bb9152c21c9b)
 
 - 🔭 Use Github.py on **Blender**
 - 🔋​ **Automatic UPDATE !!**
