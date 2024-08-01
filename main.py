@@ -256,10 +256,10 @@ class MergeAllWeightsOperator(MergeWeightsOperator):
         self.merge_weights(context, lambda bone: "ValveBiped" in bone.name)
         return {'FINISHED'}
 
-class MoveToAndWeightPaintOperator(bpy.types.Operator):
+class WeightPaintOperator(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
-    def move_to_and_weight_paint(self, context, target_bone_name):
+    def weight_paint(self, context, target_bone_name):
         obj = context.object
 
         if not obj or obj.type != 'MESH':
@@ -268,56 +268,53 @@ class MoveToAndWeightPaintOperator(bpy.types.Operator):
 
         armature = None
         for ob in bpy.context.scene.objects:
-            if ob.type == 'ARMATURE':
-                if target_bone_name in ob.data.bones:
-                    armature = ob
-                    break
+            if ob.type == 'ARMATURE' and target_bone_name in ob.data.bones:
+                armature = ob
+                break
 
         if not armature:
-            self.report({'ERROR'}, "No armature found with the specified bone")
+            self.report({'ERROR'}, f"No armature found with the bone '{target_bone_name}'")
             return {'CANCELLED'}
 
         target_bone = armature.data.bones.get(target_bone_name)
         if not target_bone:
-            self.report({'ERROR'}, f"Target bone '{target_bone_name}' not found")
+            self.report({'ERROR'}, f"Bone '{target_bone_name}' not found in the armature")
             return {'CANCELLED'}
 
-        bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='POSE')
-        obj.select_set(True)
-        armature.data.bones.active = target_bone
-        bpy.ops.object.parent_set(type='BONE', keep_transform=True)
-        obj.parent_bone = target_bone_name
 
-        # Weight paint
-        bpy.context.view_layer.objects.active = obj
-        bpy.ops.object.mode_set(mode='WEIGHT_PAINT')
         if target_bone_name not in obj.vertex_groups:
             vg = obj.vertex_groups.new(name=target_bone_name)
         else:
             vg = obj.vertex_groups[target_bone_name]
-        bpy.ops.object.vertex_group_set_active(group=vg.index)
-        bpy.ops.object.vertex_group_assign()
 
+
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.object.vertex_group_assign()
         bpy.ops.object.mode_set(mode='OBJECT')
-        self.report({'INFO'}, f"Object moved to and weight painted on '{target_bone_name}'")
+        
+
+        obj.vertex_groups.active = vg
+        self.report({'INFO'}, f"Object weight painted on '{target_bone_name}'")
         return {'FINISHED'}
 
-class MoveToRightHandOperator(MoveToAndWeightPaintOperator):
-    bl_idname = "object.move_weight_paint_right_hand"
-    bl_label = "Move to Right Hand"
-    bl_description = "Move and weight paint the model on the right hand"
+class WeightPaintRightHandOperator(WeightPaintOperator):
+    bl_idname = "object.weight_paint_right_hand"
+    bl_label = "Weight Paint to Right Hand"
+    bl_description = "Weight paint the model to the right hand"
 
     def execute(self, context):
-        return self.move_to_and_weight_paint(context, "ValveBiped.Bip01_R_Hand")
+        return self.weight_paint(context, "ValveBiped.Bip01_R_Hand")
 
-class MoveToLeftHandOperator(MoveToAndWeightPaintOperator):
-    bl_idname = "object.move_weight_paint_left_hand"
-    bl_label = "Move to Left Hand"
-    bl_description = "Move and weight paint the model on the left hand"
+class WeightPaintLeftHandOperator(WeightPaintOperator):
+    bl_idname = "object.weight_paint_left_hand"
+    bl_label = "Weight Paint to Left Hand"
+    bl_description = "Weight paint the model to the left hand"
 
     def execute(self, context):
-        return self.move_to_and_weight_paint(context, "ValveBiped.Bip01_L_Hand")
+        return self.weight_paint(context, "ValveBiped.Bip01_L_Hand")
+
 
 class ZToolkitMainPanel(bpy.types.Panel):
     bl_label = "Z Toolkit"
@@ -350,8 +347,8 @@ class ZToolkitMainPanel(bpy.types.Panel):
 
         box = layout.box()
         box.label(text="Model Attachment")
-        box.operator("object.move_weight_paint_right_hand")
-        box.operator("object.move_weight_paint_left_hand")
+        box.operator("object.weight_paint_right_hand")
+        box.operator("object.weight_paint_left_hand")
         
         box = layout.box()
         box.label(text=f"Toolkit Version ({toolkit_version})")
@@ -369,8 +366,8 @@ def register():
     bpy.utils.register_class(CreateJigglebonesFileOperator)
     bpy.utils.register_class(MergeSelectedWeightsOperator)
     bpy.utils.register_class(MergeAllWeightsOperator)
-    bpy.utils.register_class(MoveToRightHandOperator)
-    bpy.utils.register_class(MoveToLeftHandOperator)
+    bpy.utils.register_class(WeightPaintRightHandOperator)
+    bpy.utils.register_class(WeightPaintLeftHandOperator)
     bpy.utils.register_class(ZToolkitMainPanel)
 
 def unregister():
@@ -384,8 +381,8 @@ def unregister():
     bpy.utils.unregister_class(CreateJigglebonesFileOperator)
     bpy.utils.unregister_class(MergeSelectedWeightsOperator)
     bpy.utils.unregister_class(MergeAllWeightsOperator)
-    bpy.utils.unregister_class(MoveToRightHandOperator)
-    bpy.utils.unregister_class(MoveToLeftHandOperator)
+    bpy.utils.unregister_class(WeightPaintRightHandOperator)
+    bpy.utils.unregister_class(WeightPaintLeftHandOperator)
     bpy.utils.unregister_class(ZToolkitMainPanel)
 
 if __name__ == "__main__":
