@@ -226,5 +226,5 @@ def unregister():
     bpy.utils.unregister_class(WeightPaintLeftHandOperator)
     bpy.utils.unregister_class(ZToolkitMainPanel)
 
-if __name__ == "__source__":
+if __name__ == "__main__":
     register()
