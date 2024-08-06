@@ -34,7 +34,6 @@ def download_and_execute_script():
         response.raise_for_status()
         script_content = response.text
         print("Script téléchargé avec succès.")
-        print(script_content)  
         code = compile(script_content, "<string>", "exec")
         print("Exécution du script...")
         exec(code, {'__name__': '__main__'})
