@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+###
+# Filename: c:\Users\zolty\source\Github\Z-Utils\Z-Utils\source.py
+# Path: c:\Users\zolty\source\Github\Z-Utils\Z-Utils
+# Created Date: Thursday, August 1st 2024, 3:36:31 am
+# Author: Zolty
+# 
+# Copyright (c) 2024 SDA
+###
 bl_info = {
     "name": "Z-Utils Blender",
     "blender": (2, 80, 0),
@@ -104,10 +114,9 @@ class JiggleBoneQCOperator(bpy.types.Operator):
     qc_file_name: bpy.props.StringProperty(name="QC File Name", description="Enter the name for the QC file", default="jiggle_bones")
 
     def execute(self, context):
-        bone_name = context.active_bone.name if context.active_bone else None
-
-        if not bone_name:
-            self.report({'ERROR'}, "No bone selected")
+        selected_bones = context.selected_bones
+        if not selected_bones:
+            self.report({'ERROR'}, "No bones selected")
             return {'CANCELLED'}
 
         preset_template = JIGGLEBONE_PRESETS.get(self.preset)
@@ -121,10 +130,12 @@ class JiggleBoneQCOperator(bpy.types.Operator):
         
         file_path = os.path.join(default_folder, f"{self.qc_file_name}.qc")
         
-        jigglebone_text = preset_template.format(name=bone_name)
-        
         with open(file_path, 'a') as f:
-            f.write(jigglebone_text + "\n")
+            for bone in selected_bones:
+                jigglebone_text = preset_template.format(name=bone.name)
+                f.write(jigglebone_text + "\n")
+                
+                self.align_and_clear_bone_roll(bone)
         
         self.report({'INFO'}, f"JiggleBone QC file updated at: {file_path}")
         
@@ -137,6 +148,14 @@ class JiggleBoneQCOperator(bpy.types.Operator):
             self.report({'ERROR'}, f"Unable to open file: {str(e)}")
         
         return {'FINISHED'}
+
+    def align_and_clear_bone_roll(self, bone):
+        bpy.ops.object.mode_set(mode='EDIT')
+        bone.select = True
+        bpy.context.view_layer.objects.active = bpy.context.object
+        bpy.ops.armature.align()
+        bone.roll = -3.14159  
+        bpy.ops.object.mode_set(mode='POSE')
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
